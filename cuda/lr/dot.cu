@@ -99,6 +99,15 @@ CooMatrix zeroCooMatrix(int batch_size, int max_length) {
   return mat;
 }
 
+void freeCooMatrix(CooMatrix * mat) {
+  CUDA_CALL(cudaFree(mat->val));
+  CUDA_CALL(cudaFree(mat->act));
+  CUDA_CALL(cudaFree(mat->label));
+  CUDA_CALL(cudaFree(mat->err));
+  CUDA_CALL(cudaFree(mat->row_ind));
+  CUDA_CALL(cudaFree(mat->col_ind));
+}
+
 struct CooMatrixHost {
   float * val;
   int *row_ind;
@@ -114,6 +123,12 @@ CooMatrixHost zeroCooMatrixHost(int batch_size, int max_length) {
   CUDA_CALL(cudaMallocHost((void**)&mat.row_ind, sizeof(int)*max_length));
   CUDA_CALL(cudaMallocHost((void**)&mat.col_ind, sizeof(int)*max_length));
   return mat;
+}
+
+void freeCooMatrixHost(CooMatrixHost * mat){
+  CUDA_CALL(cudaFreeHost(mat->val));
+  CUDA_CALL(cudaFreeHost(mat->row_ind));
+  CUDA_CALL(cudaFreeHost(mat->col_ind));
 }
 
 void vec2coo(const vector< vector< pair<int, float> > > & data, CooMatrixHost * mat_host, CooMatrix * mat) {
@@ -241,4 +256,6 @@ int main(int argc, char ** argv) {
     lr(samples, labels, &mat_host, &mat, w, MODEL_SIZE, batch);
   }
   CUDA_CALL(cudaStreamDestroy(stream));
+  freeCooMatrix(&mat);
+  freeCooMatrixHost(&mat_host);
 }
