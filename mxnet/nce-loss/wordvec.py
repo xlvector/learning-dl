@@ -23,13 +23,14 @@ def get_net(vocab_size, num_input, num_label):
     pred = datavec[0]
     for i in range(1, num_input):
         pred = pred + datavec[i]
-    return nce_loss(data = pred,
-                    label = label,
-                    label_weight = label_weight,
-                    embed_weight = embed_weight,
-                    vocab_size = vocab_size,
-                    num_hidden = 100,
-                    num_label = num_label)    
+    probs = nce_loss(data = pred,
+                     label = label,
+                     label_weight = label_weight,
+                     embed_weight = embed_weight,
+                     vocab_size = vocab_size,
+                     num_hidden = 100,
+                     num_label = num_label)
+    return mx.sym.Group(probs)
 
 def load_data(name):
     buf = open(name).read()

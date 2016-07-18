@@ -21,5 +21,5 @@ def nce_loss(data, label, label_weight, embed_weight, vocab_size, num_hidden, nu
         sm = mx.sym.LogisticRegressionOutput(data = vec,
                                              label = label_weight[i])
         probs.append(sm)
-    return mx.sym.Group(probs)
+    return probs
 

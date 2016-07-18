@@ -14,13 +14,14 @@ def get_net(vocab_size, num_label):
     label_weight = mx.sym.Variable('label_weight')
     embed_weight = mx.sym.Variable('embed_weight')
     pred = mx.sym.FullyConnected(data = data, num_hidden = 100)
-    return nce_loss(data = pred,
-                    label = label,
-                    label_weight = label_weight,
-                    embed_weight = embed_weight,
-                    vocab_size = vocab_size,
-                    num_hidden = 100,
-                    num_label = num_label)    
+    probs = nce_loss(data = pred,
+                     label = label,
+                     label_weight = label_weight,
+                     embed_weight = embed_weight,
+                     vocab_size = vocab_size,
+                     num_hidden = 100,
+                     num_label = num_label)    
+    return mx.sym.Group(probs)
 
 class SimpleBatch(object):
     def __init__(self, data_names, data, label_names, label):
