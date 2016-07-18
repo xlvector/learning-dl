@@ -9,10 +9,10 @@ using namespace std;
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
-#define CUDA_CALL(func)							\
-  {									\
-    cudaError_t e = (func);						\
-    if(e != cudaSuccess)						\
+#define CUDA_CALL(func)\
+  {\
+    cudaError_t e = (func);\
+    if(e != cudaSuccess)\                                  \
       cout << "CUDA: " << cudaGetErrorString(e) << endl;		\
   }
 
@@ -158,10 +158,10 @@ void vec2coo(const vector< vector< pair<int, float> > > & data, CooMatrixHost * 
 }
 
 void lr(const vector< vector< pair<int, float> > > & data, 
-	const vector<float> & label,
-	CooMatrixHost * coo_mat_host, 
-	CooMatrix * coo_mat,
-	float * w, int ncol, int batch) {
+        const vector<float> & label,
+        CooMatrixHost * coo_mat_host, 
+        CooMatrix * coo_mat,
+        float * w, int ncol, int batch) {
   vec2coo(data, coo_mat_host, coo_mat);
   CUDA_CALL(cudaMemcpyAsync(coo_mat->label, label.data(), sizeof(float) * label.size(), cudaMemcpyHostToDevice, stream));
   CUDA_CALL(cudaMemset(coo_mat->act, 0, sizeof(float) * data.size()));
@@ -169,10 +169,10 @@ void lr(const vector< vector< pair<int, float> > > & data,
   int shared_memory_usage = 1;
   int num_blocks = ((coo_mat->nnz + (NUM_THREADS - 1)) / NUM_THREADS);
   dot<<<num_blocks, NUM_THREADS, shared_memory_usage, stream>>>(coo_mat->val,
-								coo_mat->row_ind,
-								coo_mat->col_ind,
-								coo_mat->nnz, 
-								coo_mat->act, w);
+                                                                coo_mat->row_ind,
+                                                                coo_mat->col_ind,
+                                                                coo_mat->nnz, 
+                                                                coo_mat->act, w);
   
   num_blocks = ((data.size() + (NUM_THREADS - 1)) / NUM_THREADS);
   vec_sigmoid<<<num_blocks, NUM_THREADS, shared_memory_usage, stream>>>(coo_mat->act, data.size());
