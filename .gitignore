@@ -1,3 +1,6 @@
+tensorflow
+mxnet/word2vec
+*.pyc
 *.bin
 *.run
 warpctc
